@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>语言设置 - 金融交易平台</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .language-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            position: relative;
+            text-align: center;
+        }
+        
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .header-title {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .language-content {
+            padding: 20px;
+        }
+        
+        .language-list {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .language-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            position: relative;
+        }
+        
+        .language-item:last-child {
+            border-bottom: none;
+        }
+        
+        .language-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .language-item.active {
+            background: #e3f2fd;
+        }
+        
+        .language-item.active::after {
+            content: '✓';
+            position: absolute;
+            right: 20px;
+            color: #007AFF;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .language-item .flag {
+            font-size: 32px;
+            margin-right: 20px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+        
+        .language-names {
+            flex: 1;
+        }
+        
+        .language-item .name {
+            color: #333;
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .language-item .name-en {
+            color: #666;
+            font-size: 14px;
+        }
+        
+
+        
+        .current-language-info {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .current-language-label {
+            color: #1976d2;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .current-language-value {
+            color: #1565c0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .footer-info {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .footer-info a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .footer-info a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部 -->
+    <div class="language-header">
+        <button class="back-btn" onclick="goBack()">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <h1 class="header-title" data-i18n="language_settings">语言设置</h1>
+    </div>
+
+    <div class="language-content">
+        <!-- 当前语言信息 -->
+        <div class="current-language-info">
+            <div class="current-language-label" data-i18n="current_language">当前语言</div>
+            <div class="current-language-value" id="currentLanguageDisplay">简体中文</div>
+        </div>
+
+        <!-- 语言列表 -->
+        <div class="language-list">
+            <div class="language-item" onclick="selectLanguage('zh')" data-lang="zh">
+                <span class="flag">🇨🇳</span>
+                <div class="language-names">
+                    <div class="name">简体中文</div>
+                    <div class="name-en">Simplified Chinese</div>
+                </div>
+            </div>
+            <div class="language-item" onclick="selectLanguage('en')" data-lang="en">
+                <span class="flag">🇺🇸</span>
+                <div class="language-names">
+                    <div class="name">English</div>
+                    <div class="name-en">英语</div>
+                </div>
+            </div>
+            <div class="language-item" onclick="selectLanguage('zh-tw')" data-lang="zh-tw">
+                <span class="flag">🇨🇳</span>
+                <div class="language-names">
+                    <div class="name">繁體中文</div>
+                    <div class="name-en">Traditional Chinese</div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- 底部信息 -->
+    <div class="footer-info">
+        <span data-i18n="powered_by">技术支持</span> 
+        <a href="javascript:;" data-i18n="financial_trading_platform">金融交易平台</a>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 多语言支持 -->
+    <script src="../assets/js/i18n.js"></script>
+
+    <script>
+        // 获取来源页面参数
+        function getSourcePage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('from') || 'index.html';
+        }
+
+        // 返回上一页
+        function goBack() {
+            const sourcePage = getSourcePage();
+            window.location.href = sourcePage;
+        }
+
+        // 选择语言
+        function selectLanguage(lang) {
+            if (window.i18n && window.i18n.switchLanguage(lang)) {
+                // 更新当前语言显示
+                updateCurrentLanguageDisplay();
+                
+                // 更新选中状态
+                updateActiveLanguage(lang);
+                
+                // 显示成功提示
+                showSuccessMessage(lang);
+                
+                // 延迟返回，让用户看到成功提示
+                setTimeout(() => {
+                    goBack();
+                }, 1500);
+            }
+        }
+
+        // 更新当前语言显示
+        function updateCurrentLanguageDisplay() {
+            const currentLang = window.i18n ? window.i18n.getCurrentLanguage() : 'zh';
+            const langNames = {
+                'zh': '简体中文',
+                'en': 'English',
+                'zh-tw': '繁體中文'
+            };
+            
+            const displayElement = document.getElementById('currentLanguageDisplay');
+            if (displayElement) {
+                displayElement.textContent = langNames[currentLang] || '简体中文';
+            }
+        }
+
+        // 更新选中状态
+        function updateActiveLanguage(selectedLang) {
+            const items = document.querySelectorAll('.language-item');
+            items.forEach(item => {
+                const lang = item.getAttribute('data-lang');
+                if (lang === selectedLang) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // 显示成功消息
+        function showSuccessMessage(lang) {
+            const langNames = {
+                'zh': '简体中文',
+                'en': 'English',
+                'zh-tw': '繁體中文'
+            };
+            
+            const message = `语言已切换为 ${langNames[lang] || '简体中文'}`;
+            
+            // 创建提示元素
+            const toast = document.createElement('div');
+            toast.className = 'toast align-items-center text-white bg-success border-0 position-fixed';
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999;';
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-check-circle me-2"></i>${message}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // 显示提示
+            const toastBootstrap = new bootstrap.Toast(toast);
+            toastBootstrap.show();
+            
+            // 自动移除提示
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, 3000);
+        }
+
+        // 页面加载时的初始化
+        window.addEventListener('load', function() {
+            // 等待i18n初始化完成
+            setTimeout(() => {
+                if (window.i18n) {
+                    const currentLang = window.i18n.getCurrentLanguage();
+                    updateCurrentLanguageDisplay();
+                    updateActiveLanguage(currentLang);
+                }
+            }, 100);
+        });
+
+        // 监听返回按钮（移动端）
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                goBack();
+            }
+        });
+
+        // 监听浏览器返回按钮
+        window.addEventListener('popstate', function() {
+            goBack();
+        });
+    </script>
+</body>
+</html>

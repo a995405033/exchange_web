@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>我的 - 金融交易平台</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 56px;
+            padding-bottom: 60px;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            border-radius: 0 0 20px 20px;
+            margin: -15px -15px 20px -15px;
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid rgba(255,255,255,0.3);
+            margin-bottom: 15px;
+        }
+        
+        .profile-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .profile-info {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .stats-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: -30px 20px 20px 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        .menu-section {
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .menu-title {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #333;
+            text-decoration: none;
+            border-bottom: 1px solid #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-item:hover {
+            background: #f8f9fa;
+            color: #007bff;
+        }
+        
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 18px;
+            color: white;
+        }
+        
+        .menu-content {
+            flex: 1;
+        }
+        
+        .menu-text {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        
+        .menu-desc {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        .menu-badge {
+            background: #dc3545;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-right: 10px;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 8px 0;
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            text-align: center;
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 12px;
+            padding: 5px;
+        }
+        
+        .nav-item.active {
+            color: #007bff;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 2px;
+        }
+        
+        .version-info {
+            text-align: center;
+            color: #6c757d;
+            font-size: 12px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-user text-primary"></i>
+                我的
+            </a>
+            <div class="d-flex">
+                <button class="btn btn-outline-primary btn-sm me-2" onclick="showQRCode()">
+                    <i class="fas fa-qrcode"></i>
+                </button>
+                <button class="btn btn-outline-primary btn-sm" onclick="showSettings()">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid" style="padding: 15px;">
+        <!-- 个人信息头部 -->
+        <div class="profile-header">
+            <img src="https://via.placeholder.com/80x80" class="profile-avatar" alt="头像" id="userAvatar">
+            <div class="profile-name" id="userName">用户名</div>
+            <div class="profile-info">
+                <span id="userEmail">user@example.com</span>
+                <span class="mx-2">|</span>
+                <span id="userPhone">138****8000</span>
+            </div>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="stats-container">
+            <div class="row g-0">
+                <div class="col-4">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalAssets">****</div>
+                        <div class="stat-label">总资产 (USDT)</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-item">
+                        <div class="stat-value" id="todayProfit">+0.00</div>
+                        <div class="stat-label">今日收益</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalTrades">0</div>
+                        <div class="stat-label">总交易次数</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 资产管理 -->
+        <div class="menu-section">
+            <div class="menu-title">
+                <i class="fas fa-wallet me-2"></i>资产管理
+            </div>
+            <a href="javascript:;" onclick="showAssets()" class="menu-item">
+                <div class="menu-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-text">我的资产</div>
+                    <div class="menu-desc">查看资产详情和持仓</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+            <a href="javascript:;" onclick="showRecharge()" class="menu-item">
+                <div class="menu-icon" style="background: linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%);">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-text">充值</div>
+                    <div class="menu-desc">数字货币充值到账</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+            <a href="javascript:;" onclick="showWithdraw()" class="menu-item">
+                <div class="menu-icon" style="background: linear-gradient(135deg, #FFB75E 0%, #ED8F03 100%);">
+                    <i class="fas fa-minus"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-text">提现</div>
+                    <div class="menu-desc">提现到银行卡或钱包</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+            <a href="javascript:;" onclick="showTransferHistory()" class="menu-item">
+                <div class="menu-icon" style="background: linear-gradient(135deg, #FF6B9D 0%, #C44569 100%);">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-text">转账记录</div>
+                    <div class="menu-desc">查看所有转账流水</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+        </div>
+
+        <!-- 交易相关 -->
+        <div class="menu-section">
+            <div class="menu-title">
+                <i class="fas fa-chart-line me-2"></i>交易相关
+            </div>
+            <a href="javascript:;" onclick="showOrderHistory()" class="menu-item">
+                <div class="menu-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="fas fa-list-ul"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-text">委托记录</div>
+                    <div class="menu-desc">查看历史委托订单</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+            <a href="javascript:;" onclick="showTradeHistory()" class="menu-item">
+                <div class="menu-icon" style="background: linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%);">
+                    <i class="fas fa-history"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-text">成交记录</div>
+                    <div class="menu-desc">查看成交历史</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+            <a href="javascript:;" onclick="showProfitLoss()" class="menu-item">
+                <div class="menu-icon" style="background: linear-gradient(135deg, #FFB75E 0%, #ED8F03 100%);">
+                    <i class="fas fa-chart-area"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-text">盈亏分析</div>
+                    <div class="menu-desc">收益统计和分析</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+        </div>
+
+        <!-- 安全中心 -->
+        <div class="menu-section">
+            <div class="menu-title">
+                <i class="fas fa-shield-alt me-2"></i>安全中心
+            </div>
+            <a href="javascript:;" onclick="showSecurity()" class="menu-item">
+                <div class="menu-icon" style="background: linear-gradient(135deg, #FF6B9D 0%, #C44569 100%);">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-text">安全设置</div>
+                    <div class="menu-desc">密码、双重验证等</div>
+                </div>
+                <span class="menu-badge">重要</span>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+            <a href="javascript:;" onclick="showRealName()" class="menu-item">
+                <div class="menu-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-text">实名认证</div>
+                    <div class="menu-desc">完成实名提升安全等级</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+            <a href="javascript:;" onclick="showLoginHistory()" class="menu-item">
+                <div class="menu-icon" style="background: linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%);">
+                    <i class="fas fa-history"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-text">登录记录</div>
+                    <div class="menu-desc">查看账户登录历史</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+        </div>
+
+        <!-- 帮助与客服 -->
+        <div class="menu-section">
+            <div class="menu-title">
+                <i class="fas fa-question-circle me-2"></i>帮助与客服
+            </div>
+            <a href="javascript:;" onclick="showHelp()" class="menu-item">
+                <div class="menu-icon" style="background: linear-gradient(135deg, #FFB75E 0%, #ED8F03 100%);">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-text">帮助中心</div>
+                    <div class="menu-desc">常见问题和使用指南</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+            <a href="javascript:;" onclick="showCustomerService()" class="menu-item">
+                <div class="menu-icon" style="background: linear-gradient(135deg, #FF6B9D 0%, #C44569 100%);">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-text">在线客服</div>
+                    <div class="menu-desc">7×24小时在线服务</div>
+                </div>
+                <span class="menu-badge">在线</span>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+            <a href="javascript:;" onclick="showFeedback()" class="menu-item">
+                <div class="menu-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="fas fa-comment"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-text">意见反馈</div>
+                    <div class="menu-desc">提交建议帮助我们改进</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+        </div>
+
+        <!-- 退出登录 -->
+        <div class="menu-section">
+            <a href="javascript:;" onclick="logout()" class="menu-item">
+                <div class="menu-icon" style="background: #6c757d;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-text">退出登录</div>
+                    <div class="menu-desc">安全退出当前账户</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+        </div>
+
+        <!-- 版本信息 -->
+        <div class="version-info">
+            <div>金融交易平台 v1.0.0 Demo</div>
+            <div>© 2024 版权所有</div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <div class="row g-0">
+            <div class="col">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <div>首页</div>
+                </a>
+            </div>
+            <div class="col">
+                <a href="trading.html" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <div>交易</div>
+                </a>
+            </div>
+            <div class="col">
+                <a href="javascript:;" class="nav-item" onclick="showAssets()">
+                    <i class="fas fa-wallet"></i>
+                    <div>资产</div>
+                </a>
+            </div>
+            <div class="col">
+                <a href="profile.html" class="nav-item active">
+                    <i class="fas fa-user"></i>
+                    <div>我的</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 模拟API -->
+    <script src="../assets/js/mock.js"></script>
+
+    <script>
+        // 检查登录状态
+        function checkAuth() {
+            if (!window.mockAPI.isLoggedIn()) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
+
+        if (!checkAuth()) {
+            // 未登录，阻止页面继续执行
+        } else {
+            // 已登录，继续初始化页面
+
+            // 显示提示消息
+            function showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast align-items-center text-white border-0 position-fixed`;
+                toast.style.cssText = 'top: 70px; right: 15px; z-index: 9999;';
+                
+                let bgClass = 'bg-primary';
+                let icon = 'fas fa-info-circle';
+                
+                if (type === 'success') {
+                    bgClass = 'bg-success';
+                    icon = 'fas fa-check-circle';
+                } else if (type === 'error') {
+                    bgClass = 'bg-danger';
+                    icon = 'fas fa-exclamation-circle';
+                }
+                
+                toast.classList.add(bgClass);
+                toast.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="${icon} me-2"></i>${message}
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(toast);
+                
+                const toastBootstrap = new bootstrap.Toast(toast);
+                toastBootstrap.show();
+                
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
+                }, 4000);
+            }
+
+            // 各种功能函数
+            function showQRCode() {
+                showToast('演示版本：二维码分享功能暂不可用', 'info');
+            }
+
+            function showSettings() {
+                showToast('演示版本：设置功能暂不可用', 'info');
+            }
+
+            function showAssets() {
+                showToast('演示版本：资产详情功能暂不可用', 'info');
+            }
+
+            function showRecharge() {
+                showToast('演示版本：充值功能暂不可用', 'info');
+            }
+
+            function showWithdraw() {
+                showToast('演示版本：提现功能暂不可用', 'info');
+            }
+
+            function showTransferHistory() {
+                showToast('演示版本：转账记录功能暂不可用', 'info');
+            }
+
+            function showOrderHistory() {
+                showToast('演示版本：委托记录功能暂不可用', 'info');
+            }
+
+            function showTradeHistory() {
+                showToast('演示版本：成交记录功能暂不可用', 'info');
+            }
+
+            function showProfitLoss() {
+                showToast('演示版本：盈亏分析功能暂不可用', 'info');
+            }
+
+            function showSecurity() {
+                showToast('演示版本：安全设置功能暂不可用', 'info');
+            }
+
+            function showRealName() {
+                showToast('演示版本：实名认证功能暂不可用', 'info');
+            }
+
+            function showLoginHistory() {
+                showToast('演示版本：登录记录功能暂不可用', 'info');
+            }
+
+            function showHelp() {
+                showToast('演示版本：帮助中心功能暂不可用', 'info');
+            }
+
+            function showCustomerService() {
+                showToast('演示版本：在线客服功能暂不可用', 'info');
+            }
+
+            function showFeedback() {
+                showToast('演示版本：意见反馈功能暂不可用', 'info');
+            }
+
+            // 退出登录
+            function logout() {
+                if (confirm('确定要退出登录吗？')) {
+                    window.mockAPI.logout();
+                    showToast('退出成功', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1000);
+                }
+            }
+
+            // 将函数添加到全局作用域
+            window.showQRCode = showQRCode;
+            window.showSettings = showSettings;
+            window.showAssets = showAssets;
+            window.showRecharge = showRecharge;
+            window.showWithdraw = showWithdraw;
+            window.showTransferHistory = showTransferHistory;
+            window.showOrderHistory = showOrderHistory;
+            window.showTradeHistory = showTradeHistory;
+            window.showProfitLoss = showProfitLoss;
+            window.showSecurity = showSecurity;
+            window.showRealName = showRealName;
+            window.showLoginHistory = showLoginHistory;
+            window.showHelp = showHelp;
+            window.showCustomerService = showCustomerService;
+            window.showFeedback = showFeedback;
+            window.logout = logout;
+
+            // 初始化用户信息
+            function initUserInfo() {
+                const currentUser = window.mockAPI.getCurrentUser();
+                if (currentUser) {
+                    // 更新用户头像和信息
+                    document.getElementById('userAvatar').src = currentUser.avatar;
+                    document.getElementById('userName').textContent = currentUser.realName || currentUser.username;
+                    document.getElementById('userEmail').textContent = currentUser.email;
+                    document.getElementById('userPhone').textContent = currentUser.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+                    
+                    // 更新统计信息
+                    document.getElementById('totalAssets').textContent = currentUser.balance.toLocaleString();
+                    document.getElementById('todayProfit').textContent = '+' + (Math.random() * 100).toFixed(2);
+                    document.getElementById('totalTrades').textContent = Math.floor(Math.random() * 100);
+                }
+            }
+
+            // 页面加载完成后初始化
+            initUserInfo();
+        }
+    </script>
+</body>
+</html>

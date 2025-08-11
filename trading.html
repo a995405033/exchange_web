@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>交易 - 金融交易平台</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 56px;
+            padding-bottom: 60px;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+        }
+        
+        .trading-header {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .pair-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .pair-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .price-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .current-price {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .price-change {
+            text-align: right;
+        }
+        
+        .price-up {
+            color: #28a745;
+        }
+        
+        .price-down {
+            color: #dc3545;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .chart-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .chart-tab {
+            padding: 8px 16px;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            background: none;
+            color: #6c757d;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chart-tab.active {
+            background: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+        
+        .trading-panel {
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .trading-tabs {
+            display: flex;
+            background: #f8f9fa;
+        }
+        
+        .trading-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            border: none;
+            background: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .trading-tab.buy {
+            color: #28a745;
+        }
+        
+        .trading-tab.sell {
+            color: #dc3545;
+        }
+        
+        .trading-tab.active {
+            background: white;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .trading-form {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .input-with-unit {
+            position: relative;
+        }
+        
+        .input-with-unit input {
+            padding-right: 50px;
+        }
+        
+        .input-unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 12px;
+        }
+        
+        .percentage-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .percentage-btn {
+            flex: 1;
+            padding: 6px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background: white;
+            color: #6c757d;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .percentage-btn:hover {
+            border-color: #007bff;
+            color: #007bff;
+        }
+        
+        .trading-submit {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .trading-submit.buy {
+            background: #28a745;
+        }
+        
+        .trading-submit.sell {
+            background: #dc3545;
+        }
+        
+        .trading-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .order-book {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .order-book-header {
+            background: #f8f9fa;
+            padding: 15px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .order-book-content {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 15px;
+            font-size: 12px;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .sell-order {
+            color: #dc3545;
+        }
+        
+        .buy-order {
+            color: #28a745;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 8px 0;
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            text-align: center;
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 12px;
+            padding: 5px;
+        }
+        
+        .nav-item.active {
+            color: #007bff;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-arrow-left me-2"></i>
+                交易
+            </a>
+            <div class="d-flex">
+                <button class="btn btn-outline-primary btn-sm me-2" onclick="showOrderHistory()">
+                    <i class="fas fa-history"></i>
+                </button>
+                <button class="btn btn-outline-primary btn-sm" onclick="showSettings()">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid" style="padding: 15px;">
+        <!-- 交易对信息 -->
+        <div class="trading-header">
+            <div class="pair-selector">
+                <div class="pair-name" id="currentPair">BTC/USDT</div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="showPairSelector()">
+                    <i class="fas fa-exchange-alt"></i>
+                </button>
+            </div>
+            <div class="price-info">
+                <div>
+                    <div class="current-price price-up" id="currentPrice">$42,150.00</div>
+                    <div style="font-size: 12px; color: #6c757d;">24H量: <span id="volume24h">156,789</span></div>
+                </div>
+                <div class="price-change">
+                    <div class="price-up" id="priceChange">+2.35%</div>
+                    <div style="font-size: 12px; color: #6c757d;">
+                        H: <span id="high24h">$42,800</span> L: <span id="low24h">$41,200</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- K线图 -->
+        <div class="chart-container">
+            <div class="chart-tabs">
+                <button class="chart-tab active" data-period="1m">1分</button>
+                <button class="chart-tab" data-period="5m">5分</button>
+                <button class="chart-tab" data-period="15m">15分</button>
+                <button class="chart-tab" data-period="1h">1小时</button>
+                <button class="chart-tab" data-period="4h">4小时</button>
+                <button class="chart-tab" data-period="1d">1天</button>
+            </div>
+            <div id="klineChart" style="height: 250px;"></div>
+        </div>
+
+        <!-- 交易表单 -->
+        <div class="trading-panel">
+            <div class="trading-tabs">
+                <button class="trading-tab buy active" onclick="switchTradingTab('buy')">
+                    <i class="fas fa-arrow-up me-1"></i>买入
+                </button>
+                <button class="trading-tab sell" onclick="switchTradingTab('sell')">
+                    <i class="fas fa-arrow-down me-1"></i>卖出
+                </button>
+            </div>
+            <div class="trading-form">
+                <form id="tradingForm">
+                    <div class="form-group">
+                        <div class="form-label">价格</div>
+                        <div class="input-with-unit">
+                            <input type="number" class="form-control" id="orderPrice" placeholder="市价" step="0.01">
+                            <span class="input-unit">USDT</span>
+                        </div>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="marketOrder" onchange="toggleMarketOrder()">
+                            <label class="form-check-label" for="marketOrder">
+                                市价单
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">数量</div>
+                        <div class="input-with-unit">
+                            <input type="number" class="form-control" id="orderAmount" placeholder="0.00" step="0.001">
+                            <span class="input-unit">BTC</span>
+                        </div>
+                        <div class="percentage-buttons">
+                            <button type="button" class="percentage-btn" onclick="setPercentage(25)">25%</button>
+                            <button type="button" class="percentage-btn" onclick="setPercentage(50)">50%</button>
+                            <button type="button" class="percentage-btn" onclick="setPercentage(75)">75%</button>
+                            <button type="button" class="percentage-btn" onclick="setPercentage(100)">100%</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">总额</div>
+                        <div class="input-with-unit">
+                            <input type="number" class="form-control" id="orderTotal" placeholder="0.00" readonly>
+                            <span class="input-unit">USDT</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div style="font-size: 12px; color: #6c757d; margin-bottom: 10px;">
+                            可用余额: <span id="availableBalance">1,000.00 USDT</span>
+                        </div>
+                        <button type="submit" class="trading-submit buy" id="submitButton">
+                            买入 BTC
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 委托单 -->
+        <div class="order-book">
+            <div class="order-book-header">
+                <i class="fas fa-list-ul me-2"></i>
+                当前委托
+                <span class="float-end" style="font-size: 12px; color: #6c757d;">
+                    <i class="fas fa-sync-alt" onclick="refreshOrders()" style="cursor: pointer;"></i>
+                </span>
+            </div>
+            <div class="order-book-content" id="currentOrders">
+                <div class="text-center py-4 text-muted">
+                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                    <div>暂无委托单</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <div class="row g-0">
+            <div class="col">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <div>首页</div>
+                </a>
+            </div>
+            <div class="col">
+                <a href="trading.html" class="nav-item active">
+                    <i class="fas fa-chart-line"></i>
+                    <div>交易</div>
+                </a>
+            </div>
+            <div class="col">
+                <a href="javascript:;" class="nav-item" onclick="showAssets()">
+                    <i class="fas fa-wallet"></i>
+                    <div>资产</div>
+                </a>
+            </div>
+            <div class="col">
+                <a href="profile.html" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <div>我的</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 模拟API -->
+    <script src="../assets/js/mock.js"></script>
+
+    <script>
+        // 检查登录状态
+        function checkAuth() {
+            if (!window.mockAPI.isLoggedIn()) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
+
+        if (!checkAuth()) {
+            // 未登录，阻止页面继续执行
+        } else {
+            // 已登录，继续初始化页面
+
+            let currentTradingType = 'buy';
+            let currentChart = null;
+
+            // 初始化K线图
+            function initKlineChart() {
+                const chartDom = document.getElementById('klineChart');
+                currentChart = echarts.init(chartDom);
+                
+                // 生成模拟K线数据
+                const data = generateKlineData();
+                
+                const option = {
+                    grid: {
+                        left: '3%',
+                        right: '3%',
+                        bottom: '3%',
+                        top: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: data.times,
+                        axisLine: { show: false },
+                        axisTick: { show: false },
+                        axisLabel: {
+                            fontSize: 10,
+                            color: '#6c757d'
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        scale: true,
+                        position: 'right',
+                        axisLine: { show: false },
+                        axisTick: { show: false },
+                        axisLabel: {
+                            fontSize: 10,
+                            color: '#6c757d',
+                            formatter: function(value) {
+                                return value.toLocaleString();
+                            }
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                color: '#f0f0f0'
+                            }
+                        }
+                    },
+                    series: [{
+                        type: 'candlestick',
+                        data: data.klines,
+                        itemStyle: {
+                            color: '#28a745',
+                            color0: '#dc3545',
+                            borderColor: '#28a745',
+                            borderColor0: '#dc3545'
+                        }
+                    }],
+                    tooltip: {
+                        trigger: 'axis',
+                        formatter: function(params) {
+                            const data = params[0].data;
+                            return `
+                                时间: ${params[0].name}<br/>
+                                开盘: ${data[1]}<br/>
+                                收盘: ${data[2]}<br/>
+                                最低: ${data[3]}<br/>
+                                最高: ${data[4]}
+                            `;
+                        }
+                    }
+                };
+                
+                currentChart.setOption(option);
+            }
+
+            // 生成模拟K线数据
+            function generateKlineData() {
+                const times = [];
+                const klines = [];
+                let basePrice = 42000;
+                
+                for (let i = 0; i < 50; i++) {
+                    const time = new Date(Date.now() - (50 - i) * 60000);
+                    times.push(time.toLocaleTimeString().slice(0, 5));
+                    
+                    const open = basePrice + (Math.random() - 0.5) * 200;
+                    const close = open + (Math.random() - 0.5) * 300;
+                    const low = Math.min(open, close) - Math.random() * 100;
+                    const high = Math.max(open, close) + Math.random() * 100;
+                    
+                    klines.push([open, close, low, high]);
+                    basePrice = close;
+                }
+                
+                return { times, klines };
+            }
+
+            // 切换图表周期
+            document.querySelectorAll('.chart-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 重新生成数据（实际应该调用API）
+                    initKlineChart();
+                });
+            });
+
+            // 切换交易类型
+            function switchTradingTab(type) {
+                currentTradingType = type;
+                
+                // 更新标签状态
+                document.querySelectorAll('.trading-tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelector(`.trading-tab.${type}`).classList.add('active');
+                
+                // 更新提交按钮
+                const submitButton = document.getElementById('submitButton');
+                submitButton.className = `trading-submit ${type}`;
+                submitButton.textContent = type === 'buy' ? '买入 BTC' : '卖出 BTC';
+                
+                // 更新可用余额显示
+                updateAvailableBalance();
+            }
+
+            // 更新可用余额
+            function updateAvailableBalance() {
+                const currentUser = window.mockAPI.getCurrentUser();
+                if (currentUser) {
+                    const balanceElement = document.getElementById('availableBalance');
+                    if (currentTradingType === 'buy') {
+                        balanceElement.textContent = `${currentUser.balance.toLocaleString()} USDT`;
+                    } else {
+                        balanceElement.textContent = '0.05 BTC'; // 模拟BTC余额
+                    }
+                }
+            }
+
+            // 切换市价单
+            function toggleMarketOrder() {
+                const marketOrder = document.getElementById('marketOrder').checked;
+                const priceInput = document.getElementById('orderPrice');
+                
+                if (marketOrder) {
+                    priceInput.value = '';
+                    priceInput.placeholder = '市价';
+                    priceInput.disabled = true;
+                } else {
+                    priceInput.placeholder = '0.00';
+                    priceInput.disabled = false;
+                    priceInput.value = document.getElementById('currentPrice').textContent.replace('$', '').replace(',', '');
+                }
+                
+                calculateTotal();
+            }
+
+            // 设置百分比
+            function setPercentage(percentage) {
+                const currentUser = window.mockAPI.getCurrentUser();
+                if (!currentUser) return;
+                
+                const amountInput = document.getElementById('orderAmount');
+                const priceInput = document.getElementById('orderPrice');
+                
+                if (currentTradingType === 'buy') {
+                    // 买入：根据USDT余额计算BTC数量
+                    const availableUSDT = currentUser.balance * (percentage / 100);
+                    const price = parseFloat(priceInput.value) || 42150; // 使用当前价格
+                    const btcAmount = availableUSDT / price;
+                    amountInput.value = btcAmount.toFixed(6);
+                } else {
+                    // 卖出：根据BTC余额计算
+                    const availableBTC = 0.05 * (percentage / 100); // 模拟BTC余额
+                    amountInput.value = availableBTC.toFixed(6);
+                }
+                
+                calculateTotal();
+            }
+
+            // 计算总额
+            function calculateTotal() {
+                const price = parseFloat(document.getElementById('orderPrice').value) || 0;
+                const amount = parseFloat(document.getElementById('orderAmount').value) || 0;
+                const total = price * amount;
+                
+                document.getElementById('orderTotal').value = total.toFixed(2);
+            }
+
+            // 监听价格和数量输入
+            document.getElementById('orderPrice').addEventListener('input', calculateTotal);
+            document.getElementById('orderAmount').addEventListener('input', calculateTotal);
+
+            // 提交交易表单
+            document.getElementById('tradingForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const price = parseFloat(document.getElementById('orderPrice').value);
+                const amount = parseFloat(document.getElementById('orderAmount').value);
+                const isMarketOrder = document.getElementById('marketOrder').checked;
+                
+                if (!amount || amount <= 0) {
+                    showToast('请输入有效的交易数量', 'error');
+                    return;
+                }
+                
+                if (!isMarketOrder && (!price || price <= 0)) {
+                    showToast('请输入有效的交易价格', 'error');
+                    return;
+                }
+                
+                // 显示加载状态
+                const submitButton = document.getElementById('submitButton');
+                const originalText = submitButton.textContent;
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>提交中...';
+                
+                try {
+                    // 创建订单数据
+                    const orderData = {
+                        coinPair: 'BTC/USDT',
+                        type: currentTradingType,
+                        amount: amount,
+                        price: isMarketOrder ? null : price,
+                        total: isMarketOrder ? null : price * amount
+                    };
+                    
+                    // 调用模拟API创建订单
+                    const result = await window.mockAPI.createOrder(orderData);
+                    
+                    if (result.success) {
+                        showToast('订单提交成功', 'success');
+                        
+                        // 清空表单
+                        document.getElementById('tradingForm').reset();
+                        document.getElementById('orderTotal').value = '';
+                        
+                        // 刷新委托单
+                        loadCurrentOrders();
+                    } else {
+                        showToast(result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('提交订单错误:', error);
+                    showToast('提交订单失败，请重试', 'error');
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalText;
+                }
+            });
+
+            // 加载当前委托单
+            async function loadCurrentOrders() {
+                try {
+                    const result = await window.mockAPI.getTradeList(1, 10);
+                    if (result.success) {
+                        const orders = result.data.list.filter(order => order.status === 'pending');
+                        const container = document.getElementById('currentOrders');
+                        
+                        if (orders.length === 0) {
+                            container.innerHTML = `
+                                <div class="text-center py-4 text-muted">
+                                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                                    <div>暂无委托单</div>
+                                </div>
+                            `;
+                        } else {
+                            container.innerHTML = orders.map(order => `
+                                <div class="order-item">
+                                    <div class="${order.type === 'buy' ? 'buy-order' : 'sell-order'}">
+                                        ${order.type === 'buy' ? '买入' : '卖出'} ${order.coinPair}
+                                    </div>
+                                    <div>
+                                        ${order.amount} × $${order.price.toLocaleString()}
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="cancelOrder(${order.id})">
+                                            取消
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('');
+                        }
+                    }
+                } catch (error) {
+                    console.error('加载委托单失败:', error);
+                }
+            }
+
+            // 取消订单
+            function cancelOrder(orderId) {
+                if (confirm('确定要取消这个订单吗？')) {
+                    showToast('演示版本：订单取消功能暂不可用', 'info');
+                    // 实际应该调用API取消订单
+                    // loadCurrentOrders();
+                }
+            }
+
+            // 显示提示消息
+            function showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast align-items-center text-white border-0 position-fixed`;
+                toast.style.cssText = 'top: 70px; right: 15px; z-index: 9999;';
+                
+                let bgClass = 'bg-primary';
+                let icon = 'fas fa-info-circle';
+                
+                if (type === 'success') {
+                    bgClass = 'bg-success';
+                    icon = 'fas fa-check-circle';
+                } else if (type === 'error') {
+                    bgClass = 'bg-danger';
+                    icon = 'fas fa-exclamation-circle';
+                }
+                
+                toast.classList.add(bgClass);
+                toast.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="${icon} me-2"></i>${message}
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(toast);
+                
+                const toastBootstrap = new bootstrap.Toast(toast);
+                toastBootstrap.show();
+                
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
+                }, 4000);
+            }
+
+            // 其他功能函数
+            function showPairSelector() {
+                showToast('演示版本：交易对选择功能暂不可用', 'info');
+            }
+
+            function showOrderHistory() {
+                showToast('演示版本：历史订单功能暂不可用', 'info');
+            }
+
+            function showSettings() {
+                showToast('演示版本：交易设置功能暂不可用', 'info');
+            }
+
+            function refreshOrders() {
+                loadCurrentOrders();
+                showToast('委托单已刷新', 'success');
+            }
+
+            function showAssets() {
+                showToast('演示版本：资产详情功能暂不可用', 'info');
+            }
+
+            // 将函数添加到全局作用域
+            window.switchTradingTab = switchTradingTab;
+            window.toggleMarketOrder = toggleMarketOrder;
+            window.setPercentage = setPercentage;
+            window.cancelOrder = cancelOrder;
+            window.showPairSelector = showPairSelector;
+            window.showOrderHistory = showOrderHistory;
+            window.showSettings = showSettings;
+            window.refreshOrders = refreshOrders;
+            window.showAssets = showAssets;
+
+            // 初始化页面
+            function init() {
+                initKlineChart();
+                updateAvailableBalance();
+                loadCurrentOrders();
+                
+                // 设置默认价格
+                document.getElementById('orderPrice').value = '42150.00';
+            }
+
+            // 页面加载完成后初始化
+            init();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>金融交易平台 - H5</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 56px;
+            padding-bottom: 60px;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+        }
+        
+        .banner-swiper {
+            height: 180px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .swiper-slide {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .quick-actions {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .action-item {
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            padding: 15px 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .action-item:hover {
+            background-color: #f8f9fa;
+            color: #007bff;
+        }
+        
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .market-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .market-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .market-item:last-child {
+            border-bottom: none;
+        }
+        
+        .market-symbol {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .market-volume {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .market-price {
+            text-align: right;
+        }
+        
+        .price-value {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .price-change {
+            font-size: 12px;
+        }
+        
+        .price-up {
+            color: #28a745;
+        }
+        
+        .price-down {
+            color: #dc3545;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 8px 0;
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            text-align: center;
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 12px;
+            padding: 5px;
+        }
+        
+        .nav-item.active {
+            color: #007bff;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 2px;
+        }
+        
+        .market-cards {
+            margin-bottom: 20px;
+        }
+        
+        .market-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+        }
+        
+        .market-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .market-card .market-symbol {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .market-card .market-price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .market-card .market-change {
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .price-up {
+            color: #28a745;
+        }
+        
+        .price-down {
+            color: #dc3545;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-avatar i {
+            font-size: 28px;
+        }
+        
+        .user-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        /* 侧边菜单样式 */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            display: none;
+        }
+        
+        .side-menu.active {
+            display: block;
+        }
+        
+        .side-menu-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .side-menu-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100%;
+            background: white;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .side-menu.active .side-menu-content {
+            transform: translateX(0);
+        }
+        
+        .side-menu-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            position: relative;
+            min-height: 120px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-avatar-large {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-avatar-large i {
+            font-size: 60px;
+            color: white;
+        }
+        
+        .user-details {
+            flex: 1;
+        }
+        
+        .greeting {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .uid {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .side-menu-list {
+            padding: 0;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            position: relative;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .menu-item i:first-child {
+            width: 24px;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+        
+        .menu-item span {
+            flex: 1;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .menu-item i:last-child {
+            color: #ccc;
+            font-size: 14px;
+        }
+        
+        /* 设定页面样式 */
+        .settings-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            display: none;
+        }
+        
+        .settings-page.active {
+            display: block;
+        }
+        
+        .settings-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .settings-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .settings-page.active .settings-content {
+            transform: translateX(0);
+        }
+        
+        .settings-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            background: #f8f9fa;
+        }
+        
+        .settings-back-btn {
+            background: none;
+            border: none;
+            color: #007AFF;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+            margin-right: 15px;
+        }
+        
+        .settings-title {
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+            flex: 1;
+            text-align: center;
+            margin-right: 40px;
+        }
+        
+        .settings-list {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            background: white;
+        }
+        
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            position: relative;
+            background: white;
+        }
+        
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+        
+        .settings-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .settings-item.logout-item {
+            margin-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+        
+        .settings-left {
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .settings-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .settings-right i {
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+        <div class="container-fluid">
+            <div class="navbar-brand d-flex align-items-center">
+                <div class="user-avatar" onclick="toggleSideMenu()" style="cursor: pointer;">
+                    <i class="fas fa-user-circle text-primary"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid" style="padding: 15px;">
+        <!-- 轮播广告 -->
+        <div class="swiper banner-swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <div>
+                        <i class="fas fa-rocket me-2"></i>
+                        新用户注册送1000U体验金
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div>
+                        <i class="fas fa-gift me-2"></i>
+                        邀请好友享受高额返佣
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div>
+                        <i class="fas fa-star me-2"></i>
+                        VIP用户享受零手续费交易
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+
+        <!-- 实时涨幅卡片 -->
+        <div class="market-cards" id="marketCards">
+            <div class="row g-2">
+                <div class="col-4">
+                    <div class="market-card">
+                        <div class="market-symbol">BTC/USDT</div>
+                        <div class="market-price" id="btcPrice">****</div>
+                        <div class="market-change price-up" id="btcChange">+0.00%</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="market-card">
+                        <div class="market-symbol">ETH/USDT</div>
+                        <div class="market-price" id="ethPrice">****</div>
+                        <div class="market-change price-up" id="ethChange">+0.00%</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="market-card">
+                        <div class="market-symbol">XRP/USDT</div>
+                        <div class="market-price" id="xrpPrice">****</div>
+                        <div class="market-change price-up" id="xrpChange">+0.00%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 快捷操作 -->
+        <div class="quick-actions">
+            <div class="row g-0">
+                <div class="col">
+                    <a href="javascript:;" onclick="showQuickRecharge()" class="action-item">
+                        <div class="action-icon">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div>快速充值</div>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="javascript:;" onclick="showSecondContract()" class="action-item">
+                        <div class="action-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>秒合约</div>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="javascript:;" onclick="showSubscription()" class="action-item">
+                        <div class="action-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div>申购</div>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="javascript:;" onclick="showShare()" class="action-item">
+                        <div class="action-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <div>分享</div>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="javascript:;" onclick="showCustomerService()" class="action-item">
+                        <div class="action-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div>在线客服</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 实时行情 -->
+        <div class="market-panel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0">
+                    <i class="fas fa-chart-area text-primary"></i>
+                    实时行情
+                </h6>
+                <a href="javascript:;" onclick="refreshMarket()" class="text-primary">
+                    <i class="fas fa-sync-alt"></i>
+                </a>
+            </div>
+            <div id="marketData">
+                <!-- 市场数据将通过JavaScript加载 -->
+            </div>
+            <div class="text-center mt-3">
+                <a href="trading.html" class="btn btn-outline-primary btn-sm">
+                    查看更多 <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <div class="row g-0">
+            <div class="col">
+                <a href="index.html" class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <div>首页</div>
+                </a>
+            </div>
+            <div class="col">
+                <a href="javascript:;" class="nav-item" onclick="showMarket()">
+                    <i class="fas fa-chart-area"></i>
+                    <div>市市</div>
+                </a>
+            </div>
+            <div class="col">
+                <a href="javascript:;" class="nav-item" onclick="showContract()">
+                    <i class="fas fa-file-contract"></i>
+                    <div>合约</div>
+                </a>
+            </div>
+            <div class="col">
+                <a href="javascript:;" class="nav-item" onclick="showStaking()">
+                    <i class="fas fa-lock"></i>
+                    <div>锁仓</div>
+                </a>
+            </div>
+            <div class="col">
+                <a href="javascript:;" class="nav-item" onclick="showAssets()">
+                    <i class="fas fa-wallet"></i>
+                    <div>资产</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 侧边菜单 -->
+    <div id="sideMenu" class="side-menu">
+        <div class="side-menu-overlay" onclick="toggleSideMenu()"></div>
+        <div class="side-menu-content">
+            <!-- 用户信息头部 -->
+            <div class="side-menu-header">
+                <div class="user-info">
+                    <div class="user-avatar-large">
+                        <i class="fas fa-user-circle text-primary"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="greeting">你好, <span id="userDisplayName">tycaz666</span></div>
+                        <div class="uid">UID: <span id="userUID">617851</span></div>
+                    </div>
+                </div>
+                <button class="close-btn" onclick="toggleSideMenu()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- 菜单列表 -->
+            <div class="side-menu-list">
+                <div class="menu-item" onclick="showMenuAction('充币')">
+                    <i class="fas fa-plus-circle text-success"></i>
+                    <span>充币</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="showMenuAction('提币')">
+                    <i class="fas fa-minus-circle text-danger"></i>
+                    <span>提币</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="showMenuAction('推广')">
+                    <i class="fas fa-share-alt text-primary"></i>
+                    <span>推广</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="showMenuAction('身份认证')">
+                    <i class="fas fa-id-card text-warning"></i>
+                    <span>身份认证</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="showMenuAction('绑定银行卡')">
+                    <i class="fas fa-credit-card text-info"></i>
+                    <span>绑定银行卡</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="showMenuAction('安全中心')">
+                    <i class="fas fa-shield-alt text-success"></i>
+                    <span>安全中心</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="showMenuAction('提币地址')">
+                    <i class="fas fa-map-marker-alt text-warning"></i>
+                    <span>提币地址</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="showMenuAction('充提记录')">
+                    <i class="fas fa-history text-secondary"></i>
+                    <span>充提记录</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="showMenuAction('帮助中心')">
+                    <i class="fas fa-question-circle text-info"></i>
+                    <span>帮助中心</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="showSettings()">
+                    <i class="fas fa-cog text-secondary"></i>
+                    <span>设定</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设定页面 -->
+    <div id="settingsPage" class="settings-page">
+        <div class="settings-overlay" onclick="hideSettings()"></div>
+        <div class="settings-content">
+            <!-- 设定页面头部 -->
+            <div class="settings-header">
+                <button class="settings-back-btn" onclick="hideSettings()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h3 class="settings-title">设定</h3>
+            </div>
+            
+            <!-- 设定列表 -->
+            <div class="settings-list">
+                <div class="settings-item" onclick="showLanguageSettings()">
+                    <div class="settings-left">
+                        <span>语言设定</span>
+                    </div>
+                    <div class="settings-right">
+                        <span id="currentLanguage">中文</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-left">
+                        <span>关于我们</span>
+                    </div>
+                    <div class="settings-right">
+                        <span>当前版本 3.5.8</span>
+                    </div>
+                </div>
+                
+                <div class="settings-item logout-item" onclick="logout()">
+                    <div class="settings-left">
+                        <span>退出登录</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+    <!-- 多语言支持 -->
+    <script src="assets/js/i18n.js"></script>
+    <!-- 模拟API -->
+    <script src="assets/js/mock.js"></script>
+
+    <script>
+        // 检查登录状态
+        function checkAuth() {
+            // 等待mockAPI加载完成
+            if (typeof window.mockAPI === 'undefined') {
+                console.log('等待mockAPI加载...');
+                return false;
+            }
+            
+            if (!window.mockAPI.isLoggedIn()) {
+                // 未登录，跳转到登录页
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
+
+        // 等待页面和脚本完全加载后再检查登录状态
+        function initPage() {
+            if (!checkAuth()) {
+                // 如果未登录，阻止页面继续执行
+                return;
+            }
+            
+            // 已登录，继续初始化页面
+            
+            // 初始化轮播
+            const swiper = new Swiper('.banner-swiper', {
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                loop: true,
+            });
+
+            // 更新实时涨幅卡片
+            function updateMarketCards(marketData) {
+                if (marketData && marketData.length >= 3) {
+                    // 更新BTC价格
+                    const btcData = marketData.find(item => item.symbol === 'BTC/USDT');
+                    if (btcData) {
+                        document.getElementById('btcPrice').textContent = btcData.price.toFixed(2);
+                        document.getElementById('btcChange').textContent = `${btcData.change24h >= 0 ? '+' : ''}${btcData.change24h.toFixed(2)}%`;
+                        document.getElementById('btcChange').className = `market-change ${btcData.change24h >= 0 ? 'price-up' : 'price-down'}`;
+                    }
+                    
+                    // 更新ETH价格
+                    const ethData = marketData.find(item => item.symbol === 'ETH/USDT');
+                    if (ethData) {
+                        document.getElementById('ethPrice').textContent = ethData.price.toFixed(2);
+                        document.getElementById('ethChange').textContent = `${ethData.change24h >= 0 ? '+' : ''}${ethData.change24h.toFixed(2)}%`;
+                        document.getElementById('ethChange').className = `market-change ${ethData.change24h >= 0 ? 'price-up' : 'price-down'}`;
+                    }
+                    
+                    // 更新XRP价格
+                    const xrpData = marketData.find(item => item.symbol === 'XRP/USDT');
+                    if (xrpData) {
+                        document.getElementById('xrpPrice').textContent = xrpData.price.toFixed(2);
+                        document.getElementById('xrpChange').textContent = `${xrpData.change24h >= 0 ? '+' : ''}${xrpData.change24h.toFixed(2)}%`;
+                        document.getElementById('xrpChange').className = `market-change ${xrpData.change24h >= 0 ? 'price-up' : 'price-down'}`;
+                    }
+                }
+            }
+
+            // 加载市场数据
+            async function loadMarketData() {
+                try {
+                    const result = await window.mockAPI.getMarketData();
+                    if (result.success) {
+                        const marketData = result.data;
+                        const marketContainer = document.getElementById('marketData');
+                        
+                        // 更新实时涨幅卡片
+                        updateMarketCards(marketData);
+                        
+                        // 更新市场列表
+                        marketContainer.innerHTML = marketData.slice(0, 4).map(item => `
+                            <div class="market-item">
+                                <div>
+                                    <div class="market-symbol">${item.symbol}</div>
+                                    <div class="market-volume">24H量: ${item.volume24h.toLocaleString()}</div>
+                                </div>
+                                <div class="market-price">
+                                    <div class="price-value ${item.change24h >= 0 ? 'price-up' : 'price-down'}">
+                                        $${item.price.toLocaleString()}
+                                    </div>
+                                    <div class="price-change ${item.change24h >= 0 ? 'price-up' : 'price-down'}">
+                                        ${item.change24h >= 0 ? '+' : ''}${item.change24h.toFixed(2)}%
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                } catch (error) {
+                    console.error('加载市场数据失败:', error);
+                }
+            }
+
+            // 刷新市场数据
+            function refreshMarket() {
+                loadMarketData();
+                // 显示提示信息
+                const toast = document.createElement('div');
+                toast.className = 'toast align-items-center text-white bg-primary border-0 position-fixed';
+                toast.style.cssText = 'top: 70px; right: 15px; z-index: 9999;';
+                toast.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas fa-check-circle me-2"></i>行情数据已刷新
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                
+                const toastBootstrap = new bootstrap.Toast(toast);
+                toastBootstrap.show();
+                
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 3000);
+            }
+
+            // 显示二维码
+            function showQRCode() {
+                const modal = new bootstrap.Modal(document.createElement('div'));
+                const modalElement = document.createElement('div');
+                modalElement.className = 'modal fade';
+                modalElement.innerHTML = `
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-qrcode text-primary"></i>
+                                    分享二维码
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <div style="width: 200px; height: 200px; background: #f8f9fa; margin: 0 auto; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 2px dashed #dee2e6;">
+                                    <i class="fas fa-qrcode" style="font-size: 80px; color: #6c757d;"></i>
+                                </div>
+                                <p class="mt-3 text-muted">扫码下载APP</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modalElement);
+                const bootstrapModal = new bootstrap.Modal(modalElement);
+                bootstrapModal.show();
+                
+                modalElement.addEventListener('hidden.bs.modal', function () {
+                    document.body.removeChild(modalElement);
+                });
+            }
+
+            // 显示通知
+            function showNotifications() {
+                alert('演示版本：您有3条未读消息\n\n1. 系统维护通知\n2. 新币种上线\n3. 活动奖励到账');
+            }
+
+            // 显示充值页面
+            function showDeposit() {
+                alert('演示版本：充值功能暂不可用\n\n实际应用中这里会跳转到充值页面');
+            }
+
+            // 快速充值
+            function showQuickRecharge() {
+                alert('演示版本：快速充值功能暂不可用\n\n实际应用中这里会跳转到充值页面');
+            }
+
+            // 秒合约
+            function showSecondContract() {
+                alert('演示版本：秒合约功能暂不可用\n\n实际应用中这里会跳转到合约交易页面');
+            }
+
+            // 申购
+            function showSubscription() {
+                alert('演示版本：申购功能暂不可用\n\n实际应用中这里会跳转到申购页面');
+            }
+
+            // 分享
+            function showShare() {
+                alert('演示版本：分享功能暂不可用\n\n实际应用中这里会跳转到分享页面');
+            }
+
+            // 在线客服
+            function showCustomerService() {
+                alert('演示版本：在线客服功能暂不可用\n\n实际应用中这里会跳转到客服页面');
+            }
+
+            // 显示资产页面
+            function showAssets() {
+                alert('演示版本：资产详情功能暂不可用\n\n实际应用中这里会显示详细的资产信息');
+            }
+            
+            // 显示市市页面
+            function showMarket() {
+                alert('演示版本：市市功能暂不可用\n\n实际应用中这里会跳转到市场页面');
+            }
+            
+            // 显示合约页面
+            function showContract() {
+                alert('演示版本：合约功能暂不可用\n\n实际应用中这里会跳转到合约交易页面');
+            }
+            
+            // 显示锁仓页面
+            function showStaking() {
+                alert('演示版本：锁仓功能暂不可用\n\n实际应用中这里会跳转到锁仓页面');
+            }
+            
+            // 切换侧边菜单
+            function toggleSideMenu() {
+                const sideMenu = document.getElementById('sideMenu');
+                if (sideMenu) {
+                    sideMenu.classList.toggle('active');
+                    // 禁止/恢复背景滚动
+                    document.body.style.overflow = sideMenu.classList.contains('active') ? 'hidden' : '';
+                }
+            }
+            
+            // 显示菜单操作
+            function showMenuAction(action) {
+                alert(`演示版本：${action}功能暂不可用\n\n实际应用中这里会跳转到${action}页面`);
+                // 点击菜单项后关闭侧边菜单
+                toggleSideMenu();
+            }
+            
+            // 显示设定页面
+            function showSettings() {
+                const settingsPage = document.getElementById('settingsPage');
+                if (settingsPage) {
+                    settingsPage.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    // 关闭侧边菜单
+                    toggleSideMenu();
+                    // 更新当前语言显示
+                    updateCurrentLanguageDisplay();
+                    
+                    // 调试信息
+                    console.log('设定页面已打开');
+                    console.log('i18n状态:', !!window.i18n);
+                    if (window.i18n) {
+                        console.log('当前语言:', window.i18n.getCurrentLanguage());
+                    }
+                }
+            }
+            
+            // 隐藏设定页面
+            function hideSettings() {
+                const settingsPage = document.getElementById('settingsPage');
+                if (settingsPage) {
+                    settingsPage.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+            
+            // 显示语言设定
+            function showLanguageSettings() {
+                console.log('点击语言设定');
+                
+                // 跳转到独立的语言设置页面
+                // 先关闭设定页面
+                hideSettings();
+                
+                // 跳转到语言设置页面
+                window.location.href = 'language-settings.html?from=index.html';
+            }
+            
+
+            
+            // 更新当前语言显示
+            function updateCurrentLanguageDisplay() {
+                const currentLangElement = document.getElementById('currentLanguage');
+                if (currentLangElement && window.i18n) {
+                    const currentLang = window.i18n.getCurrentLanguage();
+                    const langNames = {
+                        'zh': '中文',
+                        'en': 'English',
+                        'zh-tw': '繁體中文'
+                    };
+                    currentLangElement.textContent = langNames[currentLang] || '中文';
+                }
+            }
+            
+            // 退出登录
+            function logout() {
+                if (confirm('确定要退出登录吗？')) {
+                    // 调用mockAPI的退出登录
+                    if (window.mockAPI && window.mockAPI.logout) {
+                        window.mockAPI.logout();
+                        // 跳转到登录页
+                        window.location.href = 'login.html';
+                    }
+                }
+            }
+
+                        // 将函数添加到全局作用域
+            window.refreshMarket = refreshMarket;
+            window.showQuickRecharge = showQuickRecharge;
+            window.showSecondContract = showSecondContract;
+            window.showSubscription = showSubscription;
+            window.showShare = showShare;
+            window.showCustomerService = showCustomerService;
+            window.showAssets = showAssets;
+            window.showMarket = showMarket;
+            window.showContract = showContract;
+            window.showStaking = showStaking;
+            window.toggleSideMenu = toggleSideMenu;
+            window.showMenuAction = showMenuAction;
+            window.showSettings = showSettings;
+            window.hideSettings = hideSettings;
+            window.showLanguageSettings = showLanguageSettings;
+            window.logout = logout;
+
+            // 模拟价格波动
+            function simulatePriceChange() {
+                const btcPrice = document.getElementById('btcPrice');
+                const ethPrice = document.getElementById('ethPrice');
+                const xrpPrice = document.getElementById('xrpPrice');
+                
+                if (btcPrice && ethPrice && xrpPrice) {
+                    // 随机价格波动
+                    const btcChange = (Math.random() - 0.5) * 0.02; // ±1%
+                    const ethChange = (Math.random() - 0.5) * 0.015; // ±0.75%
+                    const xrpChange = (Math.random() - 0.5) * 0.025; // ±1.25%
+                    
+                    // 更新价格显示
+                    const btcCurrent = parseFloat(btcPrice.textContent.replace(/,/g, ''));
+                    const ethCurrent = parseFloat(ethPrice.textContent.replace(/,/g, ''));
+                    const xrpCurrent = parseFloat(xrpPrice.textContent.replace(/,/g, ''));
+                    
+                    if (!isNaN(btcCurrent)) {
+                        const newBtcPrice = btcCurrent * (1 + btcChange);
+                        btcPrice.textContent = newBtcPrice.toFixed(2);
+                        document.getElementById('btcChange').textContent = `${btcChange >= 0 ? '+' : ''}${(btcChange * 100).toFixed(2)}%`;
+                        document.getElementById('btcChange').className = `market-change ${btcChange >= 0 ? 'price-up' : 'price-down'}`;
+                    }
+                    
+                    if (!isNaN(ethCurrent)) {
+                        const newEthPrice = ethCurrent * (1 + ethChange);
+                        ethPrice.textContent = newEthPrice.toFixed(2);
+                        document.getElementById('ethChange').textContent = `${ethChange >= 0 ? '+' : ''}${(ethChange * 100).toFixed(2)}%`;
+                        document.getElementById('ethChange').className = `market-change ${ethChange >= 0 ? 'price-up' : 'price-down'}`;
+                    }
+                    
+                    if (!isNaN(xrpCurrent)) {
+                        const newXrpPrice = xrpCurrent * (1 + xrpChange);
+                        xrpPrice.textContent = newXrpPrice.toFixed(2);
+                        document.getElementById('xrpChange').textContent = `${xrpChange >= 0 ? '+' : ''}${(xrpChange * 100).toFixed(2)}%`;
+                        document.getElementById('xrpChange').className = `market-change ${xrpChange >= 0 ? 'price-up' : 'price-down'}`;
+                    }
+                }
+            }
+
+            // 显示用户名
+            function updateUserName() {
+                const currentUser = window.mockAPI.getCurrentUser();
+                if (currentUser) {
+                    const userNameElement = document.getElementById('userDisplayName');
+                    if (userNameElement) {
+                        userNameElement.textContent = currentUser.username || currentUser.email.split('@')[0];
+                    }
+                }
+            }
+
+            // 初始化页面
+            function init() {
+                loadMarketData();
+                updateUserName();
+                
+                // 等待i18n初始化完成后再更新语言显示
+                setTimeout(() => {
+                    updateCurrentLanguageDisplay();
+                    console.log('i18n初始化完成，当前语言:', window.i18n ? window.i18n.getCurrentLanguage() : '未初始化');
+                }, 100);
+                
+                // 定时刷新市场数据（每30秒）
+                setInterval(loadMarketData, 30000);
+                
+                // 模拟实时价格波动（每5秒）
+                setInterval(simulatePriceChange, 5000);
+            }
+
+            // 页面加载完成后初始化
+            init();
+        }
+
+        // 等待DOM和脚本完全加载后再初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 延迟一点时间确保所有脚本都加载完成
+            setTimeout(initPage, 100);
+        });
+    </script>
+</body>
+</html>
