@@ -208,7 +208,7 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- 多语言支持 -->
-    <script src="../assets/js/i18n.js"></script>
+    <script src="assets/js/i18n.js"></script>
 
     <script>
         // 获取来源页面参数
@@ -235,10 +235,10 @@
                 // 显示成功提示
                 showSuccessMessage(lang);
                 
-                // 延迟返回，让用户看到成功提示
-                setTimeout(() => {
-                    goBack();
-                }, 1500);
+                // 不再自动跳转，让用户停留在当前页面
+                // setTimeout(() => {
+                //     goBack();
+                // }, 1500);
             }
         }
 

@@ -27,6 +27,7 @@
             max-width: 400px;
             width: 100%;
             margin: 0 auto;
+            position: relative;
         }
         
         .login-header {
@@ -295,9 +296,6 @@
     </style>
 </head>
 <body>
-    <a href="../index.html" class="back-to-home">
-        <i class="fas fa-arrow-left"></i>
-    </a>
     
     <div class="container-fluid">
         <div class="login-container">
@@ -309,13 +307,13 @@
                     </div>
                     <h2 data-i18n="financial_trading_platform">金融交易平台</h2>
                 </div>
-                
-                                 <!-- 语言切换按钮 - 右上角 -->
-                 <div class="language-switcher">
-                     <button id="languageSwitchBtn" class="language-btn" onclick="openLanguageSettings()">
-                         <span data-i18n="switch_language">切换语言</span>
-                     </button>
-                 </div>
+            </div>
+
+            <!-- 语言切换按钮 - 右上角 -->
+            <div class="language-switcher">
+                <button id="languageSwitchBtn" class="language-btn" onclick="openLanguageSettings()">
+                    <span data-i18n="switch_language">切换语言</span>
+                </button>
             </div>
 
             <!-- 登录表单 -->
@@ -425,11 +423,32 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- 多语言支持 -->
-    <script src="../assets/js/i18n.js"></script>
+    <script src="assets/js/i18n.js"></script>
     <!-- 模拟API -->
-    <script src="../assets/js/mock.js"></script>
+    <script src="assets/js/mock.js"></script>
 
     <script>
+        // 检查登录状态
+        function checkAuth() {
+            // 等待mockAPI加载完成
+            if (typeof window.mockAPI === 'undefined') {
+                console.log('等待mockAPI加载...');
+                setTimeout(checkAuth, 100);
+                return false;
+            }
+            
+            if (window.mockAPI.isLoggedIn()) {
+                const currentUser = window.mockAPI.getCurrentUser();
+                if (currentUser.role === 'admin') {
+                    window.location.href = '../admin/index.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+                return true;
+            }
+            return false;
+        }
+
         // 切换标签
         function switchTab(tabName) {
             // 移除所有活动状态
@@ -585,82 +604,33 @@
             let platformName = '';
             switch(platform) {
                 case 'wechat':
-                    platformName = window.i18n.t('wechat');
+                    platformName = window.i18n ? window.i18n.t('wechat') : '微信';
                     break;
                 case 'alipay':
-                    platformName = window.i18n.t('alipay');
+                    platformName = window.i18n ? window.i18n.t('alipay') : '支付宝';
                     break;
             }
-            showToast(`${window.i18n.t('demo_version_not_support')}${platformName}${window.i18n.t('login')}`, 'info');
+            const message = window.i18n ? 
+                `${window.i18n.t('demo_version_not_support')}${platformName}${window.i18n.t('login')}` : 
+                `演示版本：暂不支持${platformName}登录`;
+            showToast(message, 'info');
         }
 
         // 忘记密码
         function showForgotPassword() {
-            showToast(window.i18n.t('demo_version_forgot_password'), 'info');
+            const message = window.i18n ? 
+                window.i18n.t('demo_version_forgot_password') : 
+                '演示版本：忘记密码功能暂不可用';
+            showToast(message, 'info');
         }
 
         // 显示用户协议
         function showTerms() {
-            showToast(`${window.i18n.t('demo_version')}：${window.i18n.t('user_agreement_page')}`, 'info');
+            const message = window.i18n ? 
+                `${window.i18n.t('demo_version')}：${window.i18n.t('user_agreement_page')}` : 
+                '演示版本：用户协议页面暂不可用';
+            showToast(message, 'info');
         }
-
-        // 监听登录表单提交
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!email || !password) {
-                showToast(window.i18n.t('please_fill_complete_info'), 'error');
-                return;
-            }
-            
-            performLogin(email, password);
-        });
-
-        // 监听注册表单提交
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('regEmail').value.trim();
-            const password = document.getElementById('regPassword').value;
-            const confirmPassword = document.getElementById('regConfirmPassword').value;
-            const inviteCode = document.getElementById('regInviteCode').value.trim();
-            const agreeTerms = document.getElementById('agreeTerms').checked;
-            
-            // 验证表单
-            if (!email || !password || !confirmPassword) {
-                showToast(window.i18n.t('please_fill_complete_register_info'), 'error');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                showToast(window.i18n.t('password_not_match'), 'error');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showToast(window.i18n.t('password_too_short'), 'error');
-                return;
-            }
-            
-            if (!agreeTerms) {
-                showToast(window.i18n.t('please_agree_terms'), 'error');
-                return;
-            }
-            
-            // 执行注册
-            const userData = {
-                email,
-                password,
-                inviteCode,
-                username: email.split('@')[0], // 使用邮箱前缀作为用户名
-                realName: email.split('@')[0] // 演示用，实际应该是单独输入
-            };
-            
-            performRegister(userData);
-        });
 
         // 语言选择相关功能
         function openLanguageSettings() {
@@ -669,15 +639,93 @@
         }
 
         // 页面加载时的初始化
-        window.addEventListener('load', function() {
-            // 如果已经登录，直接跳转
-            if (window.mockAPI.isLoggedIn()) {
-                const currentUser = window.mockAPI.getCurrentUser();
-                if (currentUser.role === 'admin') {
-                    window.location.href = '../admin/index.html';
-                } else {
-                    window.location.href = 'index.html';
-                }
+        document.addEventListener('DOMContentLoaded', function() {
+            // 等待所有脚本加载完成后再检查登录状态
+            setTimeout(function() {
+                checkAuth();
+            }, 500);
+        });
+
+        // 监听登录表单提交
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('loginEmail').value.trim();
+                    const password = document.getElementById('loginPassword').value;
+                    
+                    if (!email || !password) {
+                        const message = window.i18n ? 
+                            window.i18n.t('please_fill_complete_info') : 
+                            '请填写完整信息';
+                        showToast(message, 'error');
+                        return;
+                    }
+                    
+                    performLogin(email, password);
+                });
+            }
+        });
+
+        // 监听注册表单提交
+        document.addEventListener('DOMContentLoaded', function() {
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('regEmail').value.trim();
+                    const password = document.getElementById('regPassword').value;
+                    const confirmPassword = document.getElementById('regConfirmPassword').value;
+                    const inviteCode = document.getElementById('regInviteCode').value.trim();
+                    const agreeTerms = document.getElementById('agreeTerms').checked;
+                    
+                    // 验证表单
+                    if (!email || !password || !confirmPassword) {
+                        const message = window.i18n ? 
+                            window.i18n.t('please_fill_complete_register_info') : 
+                            '请填写完整的注册信息';
+                        showToast(message, 'error');
+                        return;
+                    }
+                    
+                    if (password !== confirmPassword) {
+                        const message = window.i18n ? 
+                            window.i18n.t('password_not_match') : 
+                            '两次输入的密码不一致';
+                        showToast(message, 'error');
+                        return;
+                    }
+                    
+                    if (password.length < 6) {
+                        const message = window.i18n ? 
+                            window.i18n.t('password_too_short') : 
+                            '密码长度不能少于6位';
+                        showToast(message, 'error');
+                        return;
+                    }
+                    
+                    if (!agreeTerms) {
+                        const message = window.i18n ? 
+                            window.i18n.t('please_agree_terms') : 
+                            '请同意用户协议';
+                        showToast(message, 'error');
+                        return;
+                    }
+                    
+                    // 执行注册
+                    const userData = {
+                        email,
+                        password,
+                        inviteCode,
+                        username: email.split('@')[0], // 使用邮箱前缀作为用户名
+                        realName: email.split('@')[0] // 演示用，实际应该是单独输入
+                    };
+                    
+                    performRegister(userData);
+                });
             }
         });
     </script>

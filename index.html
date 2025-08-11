@@ -788,6 +788,17 @@
             // 等待mockAPI加载完成
             if (typeof window.mockAPI === 'undefined') {
                 console.log('等待mockAPI加载...');
+                setTimeout(checkAuth, 100);
+                return false;
+            }
+            
+            // 首页不需要强制登录，可以查看数据
+            return true;
+        }
+
+        // 检查是否需要登录（用于跳转其他页面时）
+        function checkLoginRequired() {
+            if (typeof window.mockAPI === 'undefined') {
                 return false;
             }
             
@@ -799,16 +810,17 @@
             return true;
         }
 
-        // 等待页面和脚本完全加载后再检查登录状态
-        function initPage() {
-            if (!checkAuth()) {
-                // 如果未登录，阻止页面继续执行
-                return;
-            }
-            
-            // 已登录，继续初始化页面
-            
-            // 初始化轮播
+        // 页面加载时检查登录状态
+        document.addEventListener('DOMContentLoaded', function() {
+            // 等待所有脚本加载完成后再初始化页面
+            setTimeout(function() {
+                // 首页不需要强制登录，直接初始化
+                init();
+            }, 500);
+        });
+
+        // 初始化轮播
+        function initSwiper() {
             const swiper = new Swiper('.banner-swiper', {
                 autoplay: {
                     delay: 3000,
@@ -820,328 +832,411 @@
                 },
                 loop: true,
             });
+        }
 
-            // 更新实时涨幅卡片
-            function updateMarketCards(marketData) {
-                if (marketData && marketData.length >= 3) {
-                    // 更新BTC价格
-                    const btcData = marketData.find(item => item.symbol === 'BTC/USDT');
-                    if (btcData) {
-                        document.getElementById('btcPrice').textContent = btcData.price.toFixed(2);
-                        document.getElementById('btcChange').textContent = `${btcData.change24h >= 0 ? '+' : ''}${btcData.change24h.toFixed(2)}%`;
-                        document.getElementById('btcChange').className = `market-change ${btcData.change24h >= 0 ? 'price-up' : 'price-down'}`;
-                    }
-                    
-                    // 更新ETH价格
-                    const ethData = marketData.find(item => item.symbol === 'ETH/USDT');
-                    if (ethData) {
-                        document.getElementById('ethPrice').textContent = ethData.price.toFixed(2);
-                        document.getElementById('ethChange').textContent = `${ethData.change24h >= 0 ? '+' : ''}${ethData.change24h.toFixed(2)}%`;
-                        document.getElementById('ethChange').className = `market-change ${ethData.change24h >= 0 ? 'price-up' : 'price-down'}`;
-                    }
-                    
-                    // 更新XRP价格
-                    const xrpData = marketData.find(item => item.symbol === 'XRP/USDT');
-                    if (xrpData) {
-                        document.getElementById('xrpPrice').textContent = xrpData.price.toFixed(2);
-                        document.getElementById('xrpChange').textContent = `${xrpData.change24h >= 0 ? '+' : ''}${xrpData.change24h.toFixed(2)}%`;
-                        document.getElementById('xrpChange').className = `market-change ${xrpData.change24h >= 0 ? 'price-up' : 'price-down'}`;
-                    }
+        // 更新实时涨幅卡片
+        function updateMarketCards(marketData) {
+            if (marketData && marketData.length >= 3) {
+                // 更新BTC价格
+                const btcData = marketData.find(item => item.symbol === 'BTC/USDT');
+                if (btcData) {
+                    document.getElementById('btcPrice').textContent = btcData.price.toFixed(2);
+                    document.getElementById('btcChange').textContent = `${btcData.change24h >= 0 ? '+' : ''}${btcData.change24h.toFixed(2)}%`;
+                    document.getElementById('btcChange').className = `market-change ${btcData.change24h >= 0 ? 'price-up' : 'price-down'}`;
+                }
+                
+                // 更新ETH价格
+                const ethData = marketData.find(item => item.symbol === 'ETH/USDT');
+                if (ethData) {
+                    document.getElementById('ethPrice').textContent = ethData.price.toFixed(2);
+                    document.getElementById('ethChange').textContent = `${ethData.change24h >= 0 ? '+' : ''}${ethData.change24h.toFixed(2)}%`;
+                    document.getElementById('ethChange').className = `market-change ${ethData.change24h >= 0 ? 'price-up' : 'price-down'}`;
+                }
+                
+                // 更新XRP价格
+                const xrpData = marketData.find(item => item.symbol === 'XRP/USDT');
+                if (xrpData) {
+                    document.getElementById('xrpPrice').textContent = xrpData.price.toFixed(2);
+                    document.getElementById('xrpChange').textContent = `${xrpData.change24h >= 0 ? '+' : ''}${xrpData.change24h.toFixed(2)}%`;
+                    document.getElementById('xrpChange').className = `market-change ${xrpData.change24h >= 0 ? 'price-up' : 'price-down'}`;
                 }
             }
+        }
 
-            // 加载市场数据
-            async function loadMarketData() {
-                try {
-                    const result = await window.mockAPI.getMarketData();
-                    if (result.success) {
-                        const marketData = result.data;
-                        const marketContainer = document.getElementById('marketData');
-                        
-                        // 更新实时涨幅卡片
-                        updateMarketCards(marketData);
-                        
-                        // 更新市场列表
-                        marketContainer.innerHTML = marketData.slice(0, 4).map(item => `
-                            <div class="market-item">
-                                <div>
-                                    <div class="market-symbol">${item.symbol}</div>
-                                    <div class="market-volume">24H量: ${item.volume24h.toLocaleString()}</div>
+        // 加载市场数据
+        async function loadMarketData() {
+            try {
+                if (!window.mockAPI) {
+                    console.log('mockAPI未加载，跳过市场数据加载');
+                    return;
+                }
+                
+                const result = await window.mockAPI.getMarketData();
+                if (result.success) {
+                    const marketData = result.data;
+                    const marketContainer = document.getElementById('marketData');
+                    
+                    // 更新实时涨幅卡片
+                    updateMarketCards(marketData);
+                    
+                    // 更新市场列表
+                    marketContainer.innerHTML = marketData.slice(0, 4).map(item => `
+                        <div class="market-item">
+                            <div>
+                                <div class="market-symbol">${item.symbol}</div>
+                                <div class="market-volume">24H量: ${item.volume24h.toLocaleString()}</div>
+                            </div>
+                            <div class="market-price">
+                                <div class="price-value ${item.change24h >= 0 ? 'price-up' : 'price-down'}">
+                                    $${item.price.toLocaleString()}
                                 </div>
-                                <div class="market-price">
-                                    <div class="price-value ${item.change24h >= 0 ? 'price-up' : 'price-down'}">
-                                        $${item.price.toLocaleString()}
-                                    </div>
-                                    <div class="price-change ${item.change24h >= 0 ? 'price-up' : 'price-down'}">
-                                        ${item.change24h >= 0 ? '+' : ''}${item.change24h.toFixed(2)}%
-                                    </div>
+                                <div class="price-change ${item.change24h >= 0 ? 'price-up' : 'price-down'}">
+                                    ${item.change24h >= 0 ? '+' : ''}${item.change24h.toFixed(2)}%
                                 </div>
                             </div>
-                        `).join('');
-                    }
-                } catch (error) {
-                    console.error('加载市场数据失败:', error);
-                }
-            }
-
-            // 刷新市场数据
-            function refreshMarket() {
-                loadMarketData();
-                // 显示提示信息
-                const toast = document.createElement('div');
-                toast.className = 'toast align-items-center text-white bg-primary border-0 position-fixed';
-                toast.style.cssText = 'top: 70px; right: 15px; z-index: 9999;';
-                toast.innerHTML = `
-                    <div class="d-flex">
-                        <div class="toast-body">
-                            <i class="fas fa-check-circle me-2"></i>行情数据已刷新
                         </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('加载市场数据失败:', error);
+            }
+        }
+
+        // 刷新市场数据
+        function refreshMarket() {
+            loadMarketData();
+            // 显示提示信息
+            const toast = document.createElement('div');
+            toast.className = 'toast align-items-center text-white bg-primary border-0 position-fixed';
+            toast.style.cssText = 'top: 70px; right: 15px; z-index: 9999;';
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-check-circle me-2"></i>行情数据已刷新
                     </div>
-                `;
-                document.body.appendChild(toast);
-                
-                const toastBootstrap = new bootstrap.Toast(toast);
-                toastBootstrap.show();
-                
-                setTimeout(() => {
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            const toastBootstrap = new bootstrap.Toast(toast);
+            toastBootstrap.show();
+            
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
                     document.body.removeChild(toast);
-                }, 3000);
-            }
+                }
+            }, 3000);
+        }
 
-            // 显示二维码
-            function showQRCode() {
-                const modal = new bootstrap.Modal(document.createElement('div'));
-                const modalElement = document.createElement('div');
-                modalElement.className = 'modal fade';
-                modalElement.innerHTML = `
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">
-                                    <i class="fas fa-qrcode text-primary"></i>
-                                    分享二维码
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        // 显示二维码
+        function showQRCode() {
+            const modal = new bootstrap.Modal(document.createElement('div'));
+            const modalElement = document.createElement('div');
+            modalElement.className = 'modal fade';
+            modalElement.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="fas fa-qrcode text-primary"></i>
+                                分享二维码
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <div style="width: 200px; height: 200px; background: #f8f9fa; margin: 0 auto; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 2px dashed #dee2e6;">
+                                <i class="fas fa-qrcode" style="font-size: 80px; color: #6c757d;"></i>
                             </div>
-                            <div class="modal-body text-center">
-                                <div style="width: 200px; height: 200px; background: #f8f9fa; margin: 0 auto; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 2px dashed #dee2e6;">
-                                    <i class="fas fa-qrcode" style="font-size: 80px; color: #6c757d;"></i>
-                                </div>
-                                <p class="mt-3 text-muted">扫码下载APP</p>
-                            </div>
+                            <p class="mt-3 text-muted">扫码下载APP</p>
                         </div>
                     </div>
-                `;
-                document.body.appendChild(modalElement);
-                const bootstrapModal = new bootstrap.Modal(modalElement);
-                bootstrapModal.show();
-                
-                modalElement.addEventListener('hidden.bs.modal', function () {
+                </div>
+            `;
+            document.body.appendChild(modalElement);
+            const bootstrapModal = new bootstrap.Modal(modalElement);
+            bootstrapModal.show();
+            
+            modalElement.addEventListener('hidden.bs.modal', function () {
+                if (document.body.contains(modalElement)) {
                     document.body.removeChild(modalElement);
-                });
-            }
+                }
+            });
+        }
 
-            // 显示通知
-            function showNotifications() {
-                alert('演示版本：您有3条未读消息\n\n1. 系统维护通知\n2. 新币种上线\n3. 活动奖励到账');
-            }
+        // 显示通知
+        function showNotifications() {
+            alert('演示版本：您有3条未读消息\n\n1. 系统维护通知\n2. 新币种上线\n3. 活动奖励到账');
+        }
 
-            // 显示充值页面
-            function showDeposit() {
-                alert('演示版本：充值功能暂不可用\n\n实际应用中这里会跳转到充值页面');
-            }
+        // 显示充值页面
+        function showDeposit() {
+            alert('演示版本：充值功能暂不可用\n\n实际应用中这里会跳转到充值页面');
+        }
 
-            // 快速充值
-            function showQuickRecharge() {
-                alert('演示版本：快速充值功能暂不可用\n\n实际应用中这里会跳转到充值页面');
-            }
-
-            // 秒合约
-            function showSecondContract() {
-                alert('演示版本：秒合约功能暂不可用\n\n实际应用中这里会跳转到合约交易页面');
-            }
-
-            // 申购
-            function showSubscription() {
-                alert('演示版本：申购功能暂不可用\n\n实际应用中这里会跳转到申购页面');
-            }
-
-            // 分享
-            function showShare() {
-                alert('演示版本：分享功能暂不可用\n\n实际应用中这里会跳转到分享页面');
-            }
-
-            // 在线客服
-            function showCustomerService() {
-                alert('演示版本：在线客服功能暂不可用\n\n实际应用中这里会跳转到客服页面');
-            }
-
-            // 显示资产页面
-            function showAssets() {
-                alert('演示版本：资产详情功能暂不可用\n\n实际应用中这里会显示详细的资产信息');
+        // 快速充值
+        function showQuickRecharge() {
+            // 检查是否需要登录
+            if (!checkLoginRequired()) {
+                return;
             }
             
-            // 显示市市页面
-            function showMarket() {
-                alert('演示版本：市市功能暂不可用\n\n实际应用中这里会跳转到市场页面');
+            alert('演示版本：快速充值功能暂不可用\n\n实际应用中这里会跳转到充值页面');
+        }
+
+        // 秒合约
+        function showSecondContract() {
+            // 检查是否需要登录
+            if (!checkLoginRequired()) {
+                return;
             }
             
-            // 显示合约页面
-            function showContract() {
-                alert('演示版本：合约功能暂不可用\n\n实际应用中这里会跳转到合约交易页面');
+            alert('演示版本：秒合约功能暂不可用\n\n实际应用中这里会跳转到合约交易页面');
+        }
+
+        // 申购
+        function showSubscription() {
+            // 检查是否需要登录
+            if (!checkLoginRequired()) {
+                return;
             }
             
-            // 显示锁仓页面
-            function showStaking() {
-                alert('演示版本：锁仓功能暂不可用\n\n实际应用中这里会跳转到锁仓页面');
+            alert('演示版本：申购功能暂不可用\n\n实际应用中这里会跳转到申购页面');
+        }
+
+        // 分享
+        function showShare() {
+            // 检查是否需要登录
+            if (!checkLoginRequired()) {
+                return;
             }
             
-            // 切换侧边菜单
-            function toggleSideMenu() {
-                const sideMenu = document.getElementById('sideMenu');
-                if (sideMenu) {
-                    sideMenu.classList.toggle('active');
-                    // 禁止/恢复背景滚动
-                    document.body.style.overflow = sideMenu.classList.contains('active') ? 'hidden' : '';
+            alert('演示版本：分享功能暂不可用\n\n实际应用中这里会跳转到分享页面');
+        }
+
+        // 在线客服
+        function showCustomerService() {
+            // 检查是否需要登录
+            if (!checkLoginRequired()) {
+                return;
+            }
+            
+            alert('演示版本：在线客服功能暂不可用\n\n实际应用中这里会跳转到客服页面');
+        }
+
+        // 显示资产页面
+        function showAssets() {
+            // 检查是否需要登录
+            if (!checkLoginRequired()) {
+                return;
+            }
+            
+            alert('演示版本：资产详情功能暂不可用\n\n实际应用中这里会显示详细的资产信息');
+        }
+        
+        // 显示市市页面
+        function showMarket() {
+            // 检查是否需要登录
+            if (!checkLoginRequired()) {
+                return;
+            }
+            
+            alert('演示版本：市市功能暂不可用\n\n实际应用中这里会跳转到市场页面');
+        }
+        
+        // 显示合约页面
+        function showContract() {
+            // 检查是否需要登录
+            if (!checkLoginRequired()) {
+                return;
+            }
+            
+            alert('演示版本：合约功能暂不可用\n\n实际应用中这里会跳转到合约交易页面');
+        }
+        
+        // 显示锁仓页面
+        function showStaking() {
+            // 检查是否需要登录
+            if (!checkLoginRequired()) {
+                return;
+            }
+            
+            alert('演示版本：锁仓功能暂不可用\n\n实际应用中这里会跳转到锁仓页面');
+        }
+        
+        // 切换侧边菜单
+        function toggleSideMenu() {
+            const sideMenu = document.getElementById('sideMenu');
+            if (sideMenu) {
+                sideMenu.classList.toggle('active');
+                // 禁止/恢复背景滚动
+                document.body.style.overflow = sideMenu.classList.contains('active') ? 'hidden' : '';
+                
+                // 如果菜单打开，更新用户信息显示
+                if (sideMenu.classList.contains('active')) {
+                    updateSideMenuUserInfo();
                 }
             }
+        }
+        
+        // 更新侧边菜单用户信息
+        function updateSideMenuUserInfo() {
+            const userDisplayName = document.getElementById('userDisplayName');
+            const userUID = document.getElementById('userUID');
             
-            // 显示菜单操作
-            function showMenuAction(action) {
-                alert(`演示版本：${action}功能暂不可用\n\n实际应用中这里会跳转到${action}页面`);
-                // 点击菜单项后关闭侧边菜单
+            if (window.mockAPI && window.mockAPI.isLoggedIn()) {
+                // 已登录，显示用户信息
+                const currentUser = window.mockAPI.getCurrentUser();
+                if (userDisplayName) {
+                    userDisplayName.textContent = currentUser.username || currentUser.email.split('@')[0];
+                }
+                if (userUID) {
+                    userUID.textContent = currentUser.id || '617851';
+                }
+            } else {
+                // 未登录，显示默认信息
+                if (userDisplayName) {
+                    userDisplayName.textContent = '游客';
+                }
+                if (userUID) {
+                    userUID.textContent = '未登录';
+                }
+            }
+        }
+        
+        // 显示菜单操作
+        function showMenuAction(action) {
+            // 检查是否需要登录
+            if (!checkLoginRequired()) {
+                return;
+            }
+            
+            alert(`演示版本：${action}功能暂不可用\n\n实际应用中这里会跳转到${action}页面`);
+            // 点击菜单项后关闭侧边菜单
+            toggleSideMenu();
+        }
+        
+        // 显示设定页面
+        function showSettings() {
+            // 检查是否需要登录
+            if (!checkLoginRequired()) {
+                return;
+            }
+            
+            const settingsPage = document.getElementById('settingsPage');
+            if (settingsPage) {
+                settingsPage.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                // 关闭侧边菜单
                 toggleSideMenu();
-            }
-            
-            // 显示设定页面
-            function showSettings() {
-                const settingsPage = document.getElementById('settingsPage');
-                if (settingsPage) {
-                    settingsPage.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                    // 关闭侧边菜单
-                    toggleSideMenu();
-                    // 更新当前语言显示
-                    updateCurrentLanguageDisplay();
-                    
-                    // 调试信息
-                    console.log('设定页面已打开');
-                    console.log('i18n状态:', !!window.i18n);
-                    if (window.i18n) {
-                        console.log('当前语言:', window.i18n.getCurrentLanguage());
-                    }
-                }
-            }
-            
-            // 隐藏设定页面
-            function hideSettings() {
-                const settingsPage = document.getElementById('settingsPage');
-                if (settingsPage) {
-                    settingsPage.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            }
-            
-            // 显示语言设定
-            function showLanguageSettings() {
-                console.log('点击语言设定');
+                // 更新当前语言显示
+                updateCurrentLanguageDisplay();
                 
-                // 跳转到独立的语言设置页面
-                // 先关闭设定页面
-                hideSettings();
+                // 调试信息
+                console.log('设定页面已打开');
+                console.log('i18n状态:', !!window.i18n);
+                if (window.i18n) {
+                    console.log('当前语言:', window.i18n.getCurrentLanguage());
+                }
+            }
+        }
+        
+        // 隐藏设定页面
+        function hideSettings() {
+            const settingsPage = document.getElementById('settingsPage');
+            if (settingsPage) {
+                settingsPage.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // 显示语言设定
+        function showLanguageSettings() {
+            console.log('点击语言设定');
+            
+            // 语言设置不需要登录验证，可以直接跳转
+            // 先关闭设定页面
+            hideSettings();
+            
+            // 跳转到语言设置页面
+            window.location.href = 'language-settings.html?from=index.html';
+        }
+        
+
+        
+        // 更新当前语言显示
+        function updateCurrentLanguageDisplay() {
+            const currentLangElement = document.getElementById('currentLanguage');
+            if (currentLangElement && window.i18n) {
+                const currentLang = window.i18n.getCurrentLanguage();
+                const langNames = {
+                    'zh': '中文',
+                    'en': 'English',
+                    'zh-tw': '繁體中文'
+                };
+                currentLangElement.textContent = langNames[currentLang] || '中文';
+            }
+        }
+        
+        // 退出登录
+        function logout() {
+            // 检查是否需要登录
+            if (!checkLoginRequired()) {
+                return;
+            }
+            
+            if (confirm('确定要退出登录吗？')) {
+                // 调用mockAPI的退出登录
+                if (window.mockAPI && window.mockAPI.logout) {
+                    window.mockAPI.logout();
+                    // 跳转到登录页
+                    window.location.href = 'login.html';
+                }
+            }
+        }
+
+        // 模拟价格波动
+        function simulatePriceChange() {
+            const btcPrice = document.getElementById('btcPrice');
+            const ethPrice = document.getElementById('ethPrice');
+            const xrpPrice = document.getElementById('xrpPrice');
+            
+            if (btcPrice && ethPrice && xrpPrice) {
+                // 随机价格波动
+                const btcChange = (Math.random() - 0.5) * 0.02; // ±1%
+                const ethChange = (Math.random() - 0.5) * 0.015; // ±0.75%
+                const xrpChange = (Math.random() - 0.5) * 0.025; // ±1.25%
                 
-                // 跳转到语言设置页面
-                window.location.href = 'language-settings.html?from=index.html';
-            }
-            
-
-            
-            // 更新当前语言显示
-            function updateCurrentLanguageDisplay() {
-                const currentLangElement = document.getElementById('currentLanguage');
-                if (currentLangElement && window.i18n) {
-                    const currentLang = window.i18n.getCurrentLanguage();
-                    const langNames = {
-                        'zh': '中文',
-                        'en': 'English',
-                        'zh-tw': '繁體中文'
-                    };
-                    currentLangElement.textContent = langNames[currentLang] || '中文';
-                }
-            }
-            
-            // 退出登录
-            function logout() {
-                if (confirm('确定要退出登录吗？')) {
-                    // 调用mockAPI的退出登录
-                    if (window.mockAPI && window.mockAPI.logout) {
-                        window.mockAPI.logout();
-                        // 跳转到登录页
-                        window.location.href = 'login.html';
-                    }
-                }
-            }
-
-                        // 将函数添加到全局作用域
-            window.refreshMarket = refreshMarket;
-            window.showQuickRecharge = showQuickRecharge;
-            window.showSecondContract = showSecondContract;
-            window.showSubscription = showSubscription;
-            window.showShare = showShare;
-            window.showCustomerService = showCustomerService;
-            window.showAssets = showAssets;
-            window.showMarket = showMarket;
-            window.showContract = showContract;
-            window.showStaking = showStaking;
-            window.toggleSideMenu = toggleSideMenu;
-            window.showMenuAction = showMenuAction;
-            window.showSettings = showSettings;
-            window.hideSettings = hideSettings;
-            window.showLanguageSettings = showLanguageSettings;
-            window.logout = logout;
-
-            // 模拟价格波动
-            function simulatePriceChange() {
-                const btcPrice = document.getElementById('btcPrice');
-                const ethPrice = document.getElementById('ethPrice');
-                const xrpPrice = document.getElementById('xrpPrice');
+                // 更新价格显示
+                const btcCurrent = parseFloat(btcPrice.textContent.replace(/,/g, ''));
+                const ethCurrent = parseFloat(ethPrice.textContent.replace(/,/g, ''));
+                const xrpCurrent = parseFloat(xrpPrice.textContent.replace(/,/g, ''));
                 
-                if (btcPrice && ethPrice && xrpPrice) {
-                    // 随机价格波动
-                    const btcChange = (Math.random() - 0.5) * 0.02; // ±1%
-                    const ethChange = (Math.random() - 0.5) * 0.015; // ±0.75%
-                    const xrpChange = (Math.random() - 0.5) * 0.025; // ±1.25%
-                    
-                    // 更新价格显示
-                    const btcCurrent = parseFloat(btcPrice.textContent.replace(/,/g, ''));
-                    const ethCurrent = parseFloat(ethPrice.textContent.replace(/,/g, ''));
-                    const xrpCurrent = parseFloat(xrpPrice.textContent.replace(/,/g, ''));
-                    
-                    if (!isNaN(btcCurrent)) {
-                        const newBtcPrice = btcCurrent * (1 + btcChange);
-                        btcPrice.textContent = newBtcPrice.toFixed(2);
-                        document.getElementById('btcChange').textContent = `${btcChange >= 0 ? '+' : ''}${(btcChange * 100).toFixed(2)}%`;
-                        document.getElementById('btcChange').className = `market-change ${btcChange >= 0 ? 'price-up' : 'price-down'}`;
-                    }
-                    
-                    if (!isNaN(ethCurrent)) {
-                        const newEthPrice = ethCurrent * (1 + ethChange);
-                        ethPrice.textContent = newEthPrice.toFixed(2);
-                        document.getElementById('ethChange').textContent = `${ethChange >= 0 ? '+' : ''}${(ethChange * 100).toFixed(2)}%`;
-                        document.getElementById('ethChange').className = `market-change ${ethChange >= 0 ? 'price-up' : 'price-down'}`;
-                    }
-                    
-                    if (!isNaN(xrpCurrent)) {
-                        const newXrpPrice = xrpCurrent * (1 + xrpChange);
-                        xrpPrice.textContent = newXrpPrice.toFixed(2);
-                        document.getElementById('xrpChange').textContent = `${xrpChange >= 0 ? '+' : ''}${(xrpChange * 100).toFixed(2)}%`;
-                        document.getElementById('xrpChange').className = `market-change ${xrpChange >= 0 ? 'price-up' : 'price-down'}`;
-                    }
+                if (!isNaN(btcCurrent)) {
+                    const newBtcPrice = btcCurrent * (1 + btcChange);
+                    btcPrice.textContent = newBtcPrice.toFixed(2);
+                    document.getElementById('btcChange').textContent = `${btcChange >= 0 ? '+' : ''}${(btcChange * 100).toFixed(2)}%`;
+                    document.getElementById('btcChange').className = `market-change ${btcChange >= 0 ? 'price-up' : 'price-down'}`;
+                }
+                
+                if (!isNaN(ethCurrent)) {
+                    const newEthPrice = ethCurrent * (1 + ethChange);
+                    ethPrice.textContent = newEthPrice.toFixed(2);
+                    document.getElementById('ethChange').textContent = `${ethChange >= 0 ? '+' : ''}${(ethChange * 100).toFixed(2)}%`;
+                    document.getElementById('ethChange').className = `market-change ${ethChange >= 0 ? 'price-up' : 'price-down'}`;
+                }
+                
+                if (!isNaN(xrpPrice)) {
+                    const newXrpPrice = xrpPrice * (1 + xrpChange);
+                    xrpPrice.textContent = newXrpPrice.toFixed(2);
+                    document.getElementById('xrpChange').textContent = `${xrpChange >= 0 ? '+' : ''}${(xrpChange * 100).toFixed(2)}%`;
+                    document.getElementById('xrpChange').className = `market-change ${xrpChange >= 0 ? 'price-up' : 'price-down'}`;
                 }
             }
+        }
 
-            // 显示用户名
-            function updateUserName() {
+        // 显示用户名
+        function updateUserName() {
+            if (window.mockAPI) {
                 const currentUser = window.mockAPI.getCurrentUser();
                 if (currentUser) {
                     const userNameElement = document.getElementById('userDisplayName');
@@ -1150,34 +1245,49 @@
                     }
                 }
             }
-
-            // 初始化页面
-            function init() {
-                loadMarketData();
-                updateUserName();
-                
-                // 等待i18n初始化完成后再更新语言显示
-                setTimeout(() => {
-                    updateCurrentLanguageDisplay();
-                    console.log('i18n初始化完成，当前语言:', window.i18n ? window.i18n.getCurrentLanguage() : '未初始化');
-                }, 100);
-                
-                // 定时刷新市场数据（每30秒）
-                setInterval(loadMarketData, 30000);
-                
-                // 模拟实时价格波动（每5秒）
-                setInterval(simulatePriceChange, 5000);
-            }
-
-            // 页面加载完成后初始化
-            init();
         }
 
-        // 等待DOM和脚本完全加载后再初始化页面
-        document.addEventListener('DOMContentLoaded', function() {
-            // 延迟一点时间确保所有脚本都加载完成
-            setTimeout(initPage, 100);
-        });
+        // 初始化页面
+        function init() {
+            // 初始化轮播
+            initSwiper();
+            
+            // 加载市场数据
+            loadMarketData();
+            
+            // 更新用户名
+            updateUserName();
+            
+            // 等待i18n初始化完成后再更新语言显示
+            setTimeout(() => {
+                updateCurrentLanguageDisplay();
+                console.log('i18n初始化完成，当前语言:', window.i18n ? window.i18n.getCurrentLanguage() : '未初始化');
+            }, 100);
+            
+            // 定时刷新市场数据（每30秒）
+            setInterval(loadMarketData, 30000);
+            
+            // 模拟实时价格波动（每5秒）
+            setInterval(simulatePriceChange, 5000);
+        }
+
+        // 将函数添加到全局作用域
+        window.refreshMarket = refreshMarket;
+        window.showQuickRecharge = showQuickRecharge;
+        window.showSecondContract = showSecondContract;
+        window.showSubscription = showSubscription;
+        window.showShare = showShare;
+        window.showCustomerService = showCustomerService;
+        window.showAssets = showAssets;
+        window.showMarket = showMarket;
+        window.showContract = showContract;
+        window.showStaking = showStaking;
+        window.toggleSideMenu = toggleSideMenu;
+        window.showMenuAction = showMenuAction;
+        window.showSettings = showSettings;
+        window.hideSettings = hideSettings;
+        window.showLanguageSettings = showLanguageSettings;
+        window.logout = logout;
     </script>
 </body>
 </html>

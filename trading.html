@@ -16,7 +16,7 @@
         body {
             background-color: #f8f9fa;
             padding-top: 56px;
-            padding-bottom: 60px;
+            padding-bottom: 80px;
         }
         
         .navbar-brand {
@@ -399,7 +399,7 @@
         </div>
 
         <!-- 委托单 -->
-        <div class="order-book">
+        <div class="order-book" style="margin-bottom: 20px;">
             <div class="order-book-header">
                 <i class="fas fa-list-ul me-2"></i>
                 当前委托
@@ -449,11 +449,18 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- 模拟API -->
-    <script src="../assets/js/mock.js"></script>
+    <script src="assets/js/mock.js"></script>
 
     <script>
         // 检查登录状态
         function checkAuth() {
+            // 等待mockAPI加载完成
+            if (typeof window.mockAPI === 'undefined') {
+                console.log('等待mockAPI加载...');
+                setTimeout(checkAuth, 100);
+                return false;
+            }
+            
             if (!window.mockAPI.isLoggedIn()) {
                 window.location.href = 'login.html';
                 return false;
@@ -461,13 +468,22 @@
             return true;
         }
 
-        if (!checkAuth()) {
-            // 未登录，阻止页面继续执行
-        } else {
-            // 已登录，继续初始化页面
+        // 页面加载时检查登录状态
+        document.addEventListener('DOMContentLoaded', function() {
+            // 等待所有脚本加载完成后再检查登录状态
+            setTimeout(function() {
+                if (!checkAuth()) {
+                    // 如果未登录，阻止页面继续执行
+                    return;
+                } else {
+                    // 已登录，继续初始化页面
+                    init();
+                }
+            }, 500);
+        });
 
-            let currentTradingType = 'buy';
-            let currentChart = null;
+        let currentTradingType = 'buy';
+        let currentChart = null;
 
             // 初始化K线图
             function initKlineChart() {
@@ -844,10 +860,6 @@
                 // 设置默认价格
                 document.getElementById('orderPrice').value = '42150.00';
             }
-
-            // 页面加载完成后初始化
-            init();
-        }
     </script>
 </body>
 </html>
